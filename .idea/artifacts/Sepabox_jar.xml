@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Sepabox:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Sepabox_jar</output-path>
+    <root id="archive" name="Sepabox.jar">
+      <element id="module-output" name="Sepabox" />
+    </root>
+  </artifact>
+</component>
