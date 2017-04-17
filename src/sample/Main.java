@@ -33,6 +33,8 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Sepabox");
+        primaryStage.getIcons().add(new Image("file:resources/image/dropbox_logo.png"));
+//        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("file:resources/image/cardboard_logo.ico")));
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -44,15 +46,16 @@ public class Main extends Application {
         Label mm2 = new Label("mm");
         Label mm3 = new Label("mm");
 
-        Rectangle rec = new Rectangle(100,100);
-        Image img = new Image("file:resources/image/dropbox_logo.png");
-        rec.setFill(new ImagePattern(img));
+//        Rectangle rec = new Rectangle(100,100);
+//        Image img = new Image("file:resources/image/dropbox_logo.png");
+//        rec.setStyle("-fx-margin: 0px 0px 0px -10px");
+//        rec.setFill(new ImagePattern(img));
         Label scenetitle = new Label("Sepabox");
-        scenetitle.setStyle("-fx-padding: 0px 0px 120px 10px");
-        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        scenetitle.setStyle("-fx-padding: 0px 0px 50px -12px");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 25));
 
         grid.add(scenetitle, 1, 0);
-        grid.add(rec, 1, 0);
+//        grid.add(rec, 1, 0);
 
         Label dBox = new Label("Dužina:");
         grid.add(dBox, 0, 1);
@@ -116,7 +119,7 @@ public class Main extends Application {
 
 
 
-        Scene scene = new Scene(grid, 400, 520);
+        Scene scene = new Scene(grid, 400, 450);
         primaryStage.setScene(scene);
 
 
@@ -126,9 +129,12 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+
+
     private void buttonClick(ActionEvent e) {
         String mesures = group1.getSelectedToggle().getUserData().toString();
         String material = group2.getSelectedToggle().getUserData().toString();
+        Rectangle r;
 
        try{
            int duBoxVal = Integer.parseInt(duBox.getText());
@@ -137,33 +143,28 @@ public class Main extends Application {
 
            ArrayList<Double> mes = lenHeightSelector(mesures, material, duBoxVal, sBoxVal, vBoxVal);
 
-           Rectangle r = new Rectangle(300,175);
+           if (mes.get(0) < mes.get(1)) {
+               r = new Rectangle(175, 300);
+               GridPane grid = this.initMesureWindow(r, mes, "h");
+               Stage s = new Stage();
+               Scene sc = new Scene(grid,500, 400);
+               s.setScene(sc);
+               s.show();
 
-           r.setFill(Color.WHITE);
-           r.setStroke(Color.BLACK);
-           GridPane grid = new GridPane();
-           grid.setAlignment(Pos.CENTER);
-           grid.add(r,1,1);
+           }else if(mes.get(0) > mes.get(1)){
+               r = new Rectangle(300, 175);
+               GridPane grid = this.initMesureWindow(r, mes, "w");
+               Stage s = new Stage();
+               Scene sc = new Scene(grid,500, 300);
+               s.setScene(sc);
+               s.show();
 
-           Label pw0 = new Label("Dimenzije ploče");
-           pw0.setFont(Font.font("Tahoma", FontWeight.NORMAL, 17));
-           pw0.setStyle("-fx-padding: 0px 0px 10px 00px;");
-           grid.add(pw0, 1, 0);
+           }else{
+               r = new Rectangle(300, 300);
+           }
 
-           Label pw1 = new Label("Dužina: " + mes.get(0)+"mm");
-           pw1.setStyle("-fx-padding: 10px 0px 0px 100px;");
-
-
-           grid.add(pw1, 1, 2);
-           Label pw2 = new Label("Širina: " + mes.get(1)+"mm");
-           grid.add(pw2, 2, 1);
-           pw2.setStyle("-fx-padding: 0px 0px 0px 10px;");
-           Stage s = new Stage();
-           Scene sc = new Scene(grid,500, 300);
-           s.setScene(sc);
-           s.setResizable(false);
-           s.show();
        }catch (Exception error){
+           System.out.print(error.getMessage());
            Alert alert = new Alert(Alert.AlertType.ERROR);
            alert.setTitle("Error");
            alert.setHeaderText("Greška pri unosu podataka");
@@ -171,10 +172,6 @@ public class Main extends Application {
 
            alert.showAndWait();
        }
-
-
-
-
     }
 
     private ArrayList<Double> lenHeightSelector(String mesures, String material, int duBoxVal, int sBoxVal, double vBoxVal){
@@ -206,6 +203,34 @@ public class Main extends Application {
             list.add(height);
         }
         return list;
+    }
+
+    private GridPane initMesureWindow(Rectangle r, ArrayList<Double> mes, String type){
+        r.setFill(Color.WHITE);
+        r.setStroke(Color.BLACK);
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.add(r,1,1);
+
+        Label pw0 = new Label("Dimenzije ploče");
+        pw0.setFont(Font.font("Tahoma", FontWeight.NORMAL, 17));
+        pw0.setStyle("-fx-padding: 0px 0px 10px 00px;");
+        grid.add(pw0, 1, 0);
+
+        Label pw1 = new Label("Dužina: " + mes.get(0)+"mm");
+        if (type == "w"){
+            pw1.setStyle("-fx-padding: 10px 0px 0px 100px;");
+        }else if(type == "h"){
+            pw1.setStyle("-fx-padding: 10px 0px 0px 32px;");
+        }
+
+        grid.add(pw1, 1, 2);
+        Label pw2 = new Label("Širina: " + mes.get(1)+"mm");
+        grid.add(pw2, 2, 1);
+
+        pw2.setStyle("-fx-padding: 0px 0px 0px 10px;");
+
+        return grid;
     }
 
     private double innerMeasure(String material, double vBoxVal){
